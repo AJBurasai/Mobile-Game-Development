@@ -1,6 +1,8 @@
+
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.U2D;
 using UnityEngine.Windows;
 
@@ -17,6 +19,36 @@ public class playerMovement : MonoBehaviour
     bool laserJustShot;
     public float WaitForSeconds;
 
+    [SerializeField] InputActionReference moveAction;
+    [SerializeField] InputActionReference attackAction;
+
+    void OnEnable() => moveAction.action.Enable();
+    void OnDisable() => moveAction.action.Disable();
+
+    void Update()
+    {
+        Vector2 move = moveAction.action.ReadValue<Vector2>();
+
+
+        // Horizontal Movement
+        xInput = UnityEngine.Input.GetAxisRaw("Horizontal");
+
+        // <Vertical Movement
+        yInput = UnityEngine.Input.GetAxisRaw("Vertical");
+        bool flyingUp = UnityEngine.Input.GetAxisRaw("Vertical") > 0;
+        animator.SetBool("flyingUp", flyingUp);
+        bool flyingDown = UnityEngine.Input.GetAxisRaw("Vertical") < 0;
+        animator.SetBool("flyingDown", flyingDown);
+
+     
+        if (UnityEngine.Input.////////) && laserJustShot == true)
+        {
+            Instantiate(Laser, player_plane.transform.position, Quaternion.identity).GetComponent<Rigidbody2D>().AddForce(player_plane.transform.right * 10, ForceMode2D.Impulse);
+            StartCoroutine(nameof(laserCooldown));
+            laserJustShot = false;
+        }
+    }
+
     private void Start()
     {
         laserJustShot = true;
@@ -31,27 +63,7 @@ public class playerMovement : MonoBehaviour
         laserJustShot = true;
     }
     
-    private void Update()
-    {
-        // Horizontal Movement
-        xInput = UnityEngine.Input.GetAxisRaw("Horizontal");
 
-        // <Vertical Movement
-        yInput = UnityEngine.Input.GetAxisRaw("Vertical");
-        bool flyingUp = UnityEngine.Input.GetAxisRaw("Vertical") > 0;
-        animator.SetBool("flyingUp", flyingUp);
-        bool flyingDown = UnityEngine.Input.GetAxisRaw("Vertical") < 0;
-        animator.SetBool("flyingDown", flyingDown);
-
-        // Laser Shooting Script
-        if (UnityEngine.Input.GetKey(KeyCode.Space) && laserJustShot == true)
-        {
-            Instantiate(Laser, player_plane.transform.position, Quaternion.identity).GetComponent<Rigidbody2D>().AddForce(player_plane.transform.right * 10, ForceMode2D.Impulse);
-            StartCoroutine(nameof(laserCooldown));
-            laserJustShot = false;          
-        }
-    }
-   
     [System.Obsolete]
     private void FixedUpdate()
     {
@@ -60,5 +72,4 @@ public class playerMovement : MonoBehaviour
        rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.x);
 
     }
-
 }
