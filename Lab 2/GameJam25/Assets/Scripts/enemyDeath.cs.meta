@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 26ea89369b7145746b2746a2d6398827
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - animator: {instanceID: 0}
+  - explosion: {instanceID: 0}
+  - enemy1: {fileID: 5435790578471124357, guid: c3abc42aff99a984cab5c226be42914d, type: 3}
+  - enemy2: {fileID: 373044558271986386, guid: ea5e0e7e2bb12c148a842d10acf31f9b, type: 3}
+  - enemy3: {fileID: 8319786645339746371, guid: f8191b1b2bb48b9448f44432bf08b67c, type: 3}
+  - enemy4: {fileID: 7495891445388396800, guid: f4f5b365795460e42a9fa3de5f920aa5, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
