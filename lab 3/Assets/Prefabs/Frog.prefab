@@ -12,10 +12,11 @@ GameObject:
   - component: {fileID: 6539803147162192674}
   - component: {fileID: 7367996877678540784}
   - component: {fileID: 3665178213289690568}
-  - component: {fileID: 586006485600201000}
+  - component: {fileID: 5001061125662359268}
+  - component: {fileID: 3656628313826315559}
   m_Layer: 0
   m_Name: Frog
-  m_TagString: Untagged
+  m_TagString: Frog
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -37,6 +38,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6539803147162192674
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -55,6 +57,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -76,9 +80,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 5158404753353345565, guid: bb8e9ec6d7c15b44b93e1977173c7159, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -88,7 +94,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!50 &7367996877678540784
 Rigidbody2D:
@@ -195,7 +200,7 @@ PolygonCollider2D:
       - {x: -0.01, y: -0.085}
       - {x: 0.089999996, y: -0.114999995}
   m_UseDelaunayMesh: 0
---- !u!114 &586006485600201000
+--- !u!114 &5001061125662359268
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -204,6 +209,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 5497442954247618228}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ca3c90c129f5cd4cb8fe9984242a805, type: 3}
+  m_Script: {fileID: 11500000, guid: 24d47a3ce0ed2d44a9afa5bbd4acaa0d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::FrogCounter
+  spawner: {fileID: 0}
+--- !u!114 &3656628313826315559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5497442954247618228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30238cd01914eee41911ac8dfc952728, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FrogChaos
+  frogPrefab: {fileID: 5497442954247618228}
+  cloneInterval: 2
+  cloneChance: 0.503
+  maxFrogs: 9999
+  uselessCalculations: 9999
+  spinSpeed: 360
+  spamConsole: 1
+  logInterval: 3
