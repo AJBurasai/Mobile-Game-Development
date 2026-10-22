@@ -54,7 +54,6 @@ public class FrogSpawner : MonoBehaviour
             frog.GetComponent<FrogCounter>().spawner = this;
 
             score++;
-            Debug.Log("Frog spawned at: x" + tapPosition.x + " y" + tapPosition.y);
         }
     }
 

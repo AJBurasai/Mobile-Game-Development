@@ -28,6 +28,7 @@ public class FrogCounter : MonoBehaviour
         else if (!isOnScreen && wasOnScreen)
         {
             spawner.ChangeScore(-1);
+            Destroy(this.gameObject);
         }
 
         wasOnScreen = isOnScreen;

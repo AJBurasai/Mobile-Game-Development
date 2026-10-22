@@ -8,14 +8,9 @@ public class FrogChaos : MonoBehaviour
     public float cloneChance = 0.5f;
     public int maxFrogs = 200;
     public float noGravityChance = 0.2f;
-    public int uselessCalculations = 500;
     public float spinSpeed = 180f;
 
-    public bool spamConsole = true;
-    public float logInterval = 1f;
-
     private float cloneTimer;
-    private float logTimer;
     private FrogCounter frogCounter;
 
     void Start()
@@ -36,38 +31,13 @@ public class FrogChaos : MonoBehaviour
 
         if (rb == null)
             return;
-
-        if (Random.value < noGravityChance)
-        {
-            rb.gravityScale = 0f;
-            Debug.Log(name + " has escaped gravity!");
-        }
-        else
-        {
-            rb.gravityScale = 1f;
-        }
     } 
 
     void Update()
     {
-        float result = 0f;
-
-        for (int i = 0; i < uselessCalculations; i++)
-        {
-            result += Mathf.Sin(i * Time.deltaTime);
-            result *= 0.99999f;
-        }
-
-        transform.rotation = Quaternion.Euler(
-            0f, 0f, result % 360f
-        );
-
         transform.Rotate(
             0f, 0f, spinSpeed * Time.deltaTime
         );
-
-        transform.localScale = Vector3.one *
-            Random.Range(0.5f, 1.5f);
 
         SpriteRenderer sprite =
             GetComponent<SpriteRenderer>();
@@ -96,19 +66,6 @@ public class FrogChaos : MonoBehaviour
                 SpawnClone();
             }
         }
-
-        logTimer += Time.deltaTime;
-
-        if (spamConsole && logTimer >= logInterval)
-        {
-            logTimer = 0f;
-
-            Debug.Log(
-                name + " is still calculating nonsense. " +
-                "Frogs found: " +
-                GameObject.FindGameObjectsWithTag("Frog").Length
-            );
-        }
     }
 
     void SpawnClone()
@@ -131,7 +88,5 @@ public class FrogChaos : MonoBehaviour
         {
             cloneCounter.spawner = frogCounter.spawner;
         }
-
-        Debug.Log("ANOTHER FROG HAS BEEN CREATED.");
     }
 }
