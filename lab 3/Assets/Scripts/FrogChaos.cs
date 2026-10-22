@@ -39,9 +39,6 @@ public class FrogChaos : MonoBehaviour
             0f, 0f, spinSpeed * Time.deltaTime
         );
 
-        transform.localScale = Vector3.one *
-            Random.Range(0.5f, 1.5f);
-
         SpriteRenderer sprite =
             GetComponent<SpriteRenderer>();
 
