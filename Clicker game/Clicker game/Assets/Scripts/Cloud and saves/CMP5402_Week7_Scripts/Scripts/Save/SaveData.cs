@@ -33,28 +33,11 @@ namespace CMP5402.Week7
         public long savedAtUnixSeconds;
 
         // ---- progress ----
-        public int level = 1;
-        public int coins;
-        public int bestScore;
-        public float playTimeSeconds;
-        public List<string> unlockedSkins = new List<string>();
-
-        // Example of the "dictionary" workaround: a list of serialisable pairs.
-        public List<SkinStat> skinStats = new List<SkinStat>();
-
-        // Added in version 2: the tutorial has been completed. Version 1 files get it filled in by Migrate.
-        public bool tutorialDone;
-
-        [Serializable]
-        public class SkinStat
-        {
-            public string skin;
-            public int timesUsed;
-        }
+        public int potions = 0;
 
         public SaveData Clone() => UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(this));
 
         public override string ToString() =>
-            $"v{version} #{saveCounter} ({(string.IsNullOrEmpty(saveId) ? "no id" : saveId.Substring(0, Math.Min(6, saveId.Length)))}) level {level}, {coins} coins, best {bestScore}, {(unlockedSkins?.Count ?? 0)} skins";
+            $"v{version} #{saveCounter} ({(string.IsNullOrEmpty(saveId) ? "no id" : saveId.Substring(0, Math.Min(6, saveId.Length)))}) potions {potions}";
     }
 }

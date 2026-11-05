@@ -79,9 +79,9 @@ namespace CMP5402.Week7
 
             GUILayout.Space(8);
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("+10 coins, next level", button, GUILayout.Height(bh)))
+            if (GUILayout.Button("+10 potions", button, GUILayout.Height(bh)))
             {
-                SaveManager.Change(s => { s.coins += 10; s.level++; });
+                SaveManager.Change(s => { s.potions+=30; });
                 lastAction = "changed; dirty = true (save happens on pause or Save now)";
             }
             if (GUILayout.Button("Save now", button, GUILayout.Height(bh)))

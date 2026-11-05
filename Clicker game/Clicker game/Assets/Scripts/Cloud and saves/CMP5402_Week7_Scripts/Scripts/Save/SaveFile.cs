@@ -127,14 +127,7 @@ namespace CMP5402.Week7
             Migrate(data);
             // Valid JSON can still carry impossible values or missing collections. Repair rather than crash later.
             data.saveId ??= "";
-            data.unlockedSkins ??= new System.Collections.Generic.List<string>();
-            data.skinStats ??= new System.Collections.Generic.List<SaveData.SkinStat>();
-            data.skinStats.RemoveAll(s => s == null);
-            data.level = Mathf.Max(1, data.level);
-            data.coins = Mathf.Max(0, data.coins);
-            data.bestScore = Mathf.Max(0, data.bestScore);
-            data.saveCounter = Math.Max(0, data.saveCounter);
-            data.playTimeSeconds = Mathf.Max(0f, data.playTimeSeconds);
+            data.potions = Mathf.Max(0, data.potions);
             return data;
         }
 
@@ -145,7 +138,6 @@ namespace CMP5402.Week7
             if (data.version < 2)
             {
                 // Version 1 had no tutorialDone flag. Anyone past level 1 has clearly done it.
-                data.tutorialDone = data.level > 1;
                 data.version = 2;
             }
             // if (data.version < 3) { ... data.version = 3; }
