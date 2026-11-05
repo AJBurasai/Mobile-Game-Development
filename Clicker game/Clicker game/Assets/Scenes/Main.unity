@@ -1435,7 +1435,7 @@ GameObject:
   - component: {fileID: 589310112}
   - component: {fileID: 589310111}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: MenuPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3566,8 +3566,7 @@ MonoBehaviour:
   clickerController: {fileID: 2110584033}
   clickUpgradeBaseCost: 20
   clickUpgradeCostMult: 1.5
-  clickUpgradeName: 
-  clickUpgrade: {fileID: 0}
+  clickUpgrade: {fileID: 2110584038}
 --- !u!1 &2128107655
 GameObject:
   m_ObjectHideFlags: 0

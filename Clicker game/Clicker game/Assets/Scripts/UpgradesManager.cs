@@ -11,32 +11,35 @@ public class UpgradesManager : MonoBehaviour
     public double clickUpgradeBaseCost;     // base cost for click upgrade
     public double clickUpgradeCostMult;      // cost multiplyer for click upgrade
 
-    public string clickUpgradeName;
-
     [Header ("Upgrades")]
-    public Upgrades clickUpgrade;      
+    public Upgrades clickUpgrade;
 
-    public void StartUpgradeManager()
+
+    void Start()        // temporary fix to a problem in the clicker controller script
     {
-        clickUpgradeName = "Potions per tap";
+        StartUpgradeManager();
+    }
+
+    public void StartUpgradeManager()           // runs on game start, sets default values, make sure these get saved 
+    {
         clickUpgradeBaseCost = 20;
         clickUpgradeCostMult = 1.5;
         UpdateClickUpgradeUI();
     }
 
-    public double Cost()
+    public double Cost()        // increases cost when upgrade is bought
     {
-        return clickUpgradeBaseCost * Math.Pow(clickUpgradeCostMult, clickerController.gameData.clickUpgradeLevel);
+        return Math.Ceiling(clickUpgradeBaseCost * Math.Pow(clickUpgradeCostMult, clickerController.gameData.clickUpgradeLevel));       
     }
 
-    public void UpdateClickUpgradeUI()
+    public void UpdateClickUpgradeUI()      // update ui elements when called
     {
-        clickUpgrade.LevelText.text = clickerController.gameData.clickUpgradeLevel.ToString();
+        clickUpgrade.LevelText.text = "Level: " + clickerController.gameData.clickUpgradeLevel.ToString();
+        clickUpgrade.NameText.text = "+1 Potions per tap";
         clickUpgrade.CostText.text = "Cost: " + Cost() + " potions";
-        clickUpgrade.NameText.text = "+1 " + clickUpgradeName;
     }
 
-    public void BuyUpgrade()
+    public void BuyUpgrade()            // buy upgrade, increase cost and upgrade level
     {
         if (clickerController.gameData.potions >= Cost())
         {
@@ -44,6 +47,6 @@ public class UpgradesManager : MonoBehaviour
             clickerController.gameData.clickUpgradeLevel +=1;
         }
 
-        UpdateClickUpgradeUI();
+        UpdateClickUpgradeUI();     // update ui when something is bought
     }
 }

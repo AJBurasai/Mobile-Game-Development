@@ -10,7 +10,6 @@ public class MainMenuButtons : MonoBehaviour
 
     public void UpgradesButtonTapped()
     {
-        Debug.Log("Upgrades button tapped");
         if (!isPaused)          // check if the game is already paused or not
         {
             ShowUpgradesPanel();
