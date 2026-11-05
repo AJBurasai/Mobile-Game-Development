@@ -6,16 +6,29 @@ public class ClickerController : MonoBehaviour
 
     /* This Script handles basic functionality for the clicker button and its interactions */
 
+    public UpgradesManager upgradesManager;
     public GameData gameData; 
     public TextMeshProUGUI potionsText;
 
-    public void Update()
+    /*      // not working as intended right now, fix later as this will help make code cleaner
+    public void Start()     
+    {
+        upgradesManager.StartUpgradeManager();
+    }
+    */
+
+    public void Update()        // update ui on every frame
     {
         potionsText.text = gameData.potions + " potions";
     }
    
-    public void BrewPotion()
+    public void BrewPotion()        // make potion when cauldron clicked based on upgrade strength
     {
-        gameData.potions += 1;
+        gameData.potions += ClickStrength();
+    }
+
+    public double ClickStrength()       // return value used for calculating how many potions to add to running total
+    {
+        return 1 + gameData.clickUpgradeLevel;
     }
 }
