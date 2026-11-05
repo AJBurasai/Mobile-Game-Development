@@ -6,9 +6,14 @@ public class ClickerController : MonoBehaviour
 
     /* This Script handles basic functionality for the clicker button and its interactions */
 
+    public UpgradesManager upgradesManager;
     public GameData gameData; 
     public TextMeshProUGUI potionsText;
 
+    public void Start()
+    {
+        upgradesManager.StartUpgradeManager();
+    }
     public void Update()
     {
         potionsText.text = gameData.potions + " potions";
@@ -16,6 +21,11 @@ public class ClickerController : MonoBehaviour
    
     public void BrewPotion()
     {
-        gameData.potions += 1;
+        gameData.potions += ClickStrength();
+    }
+
+    public double ClickStrength()
+    {
+        return 1 + gameData.clickUpgradeLevel;
     }
 }
