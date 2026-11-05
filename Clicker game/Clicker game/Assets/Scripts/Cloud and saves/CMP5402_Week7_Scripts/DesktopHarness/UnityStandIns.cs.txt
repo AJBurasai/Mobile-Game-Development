@@ -1,0 +1,78 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+namespace UnityEngine {
+  public partial class Object { public string name; public static implicit operator bool(Object o)=>o!=null; public static bool operator==(Object a,Object b)=>ReferenceEquals(a,b); public static bool operator!=(Object a,Object b)=>!ReferenceEquals(a,b); public override bool Equals(object o)=>ReferenceEquals(this,o); public override int GetHashCode()=>0; public static void Destroy(Object o){} public static void DontDestroyOnLoad(Object o){} }
+  public class Component : Object { public Transform transform; public GameObject gameObject; }
+  public class Behaviour : Component { public bool enabled; }
+  public class MonoBehaviour : Behaviour { }
+  public class GameObject : Object { }
+  public class Transform : Component { }
+  public struct Rect { public float xMin, yMin, width, height; public Rect(float x,float y,float w,float h){xMin=x;yMin=y;width=w;height=h;} }
+  public struct Color { public static Color white; }
+  public static class Mathf { public static int Max(int a,int b)=>Math.Max(a,b); public static long Max(long a,long b)=>Math.Max(a,b); public static float Max(float a,float b)=>Math.Max(a,b); public static int Min(int a,int b)=>Math.Min(a,b); public static float Min(float a,float b)=>Math.Min(a,b); public static float Clamp01(float v)=>Math.Clamp(v,0f,1f); public static int Clamp(int v,int a,int b)=>Math.Clamp(v,a,b); public static float Clamp(float v,float a,float b)=>Math.Clamp(v,a,b); }
+  public static class Time { public static float unscaledTime, unscaledDeltaTime; public static double realtimeSinceStartupAsDouble; }
+  public enum NetworkReachability { NotReachable, ReachableViaCarrierDataNetwork, ReachableViaLocalAreaNetwork }
+  public static class Application { public static int targetFrameRate; public static string persistentDataPath = "/tmp/pdp"; public static NetworkReachability internetReachability; }
+  public static class Debug { public static void Log(object o){ Console.WriteLine("    LOG " + o); } public static void LogWarning(object o){ Console.WriteLine("    WARN " + o); } public static void LogError(object o){} }
+  public static class Screen { public static int width, height; }
+  public static class PlayerPrefs { public static Dictionary<string,object> D=new Dictionary<string,object>(); public static bool HasKey(string k)=>D.ContainsKey(k); public static int GetInt(string k,int d)=>D.TryGetValue(k,out var v)?(int)v:d; public static float GetFloat(string k,float d)=>D.TryGetValue(k,out var v)?(float)v:d; public static string GetString(string k,string d)=>D.TryGetValue(k,out var v)?(string)v:d; public static void SetInt(string k,int v){D[k]=v;} public static void SetFloat(string k,float v){D[k]=v;} public static void SetString(string k,string v){D[k]=v;} public static void Save(){} public static void DeleteKey(string k){D.Remove(k);} }
+  public enum KeyCode { F3 }
+  public enum TouchPhase { Began }
+  public struct Touch { public TouchPhase phase; }
+  public static class Input { public static bool GetKeyDown(KeyCode k)=>false; public static int touchCount; public static Touch GetTouch(int i)=>default; }
+  public class GUIStyle { public GUIStyle(GUIStyle o){} public bool richText; public int fontSize; }
+  public class GUISkin { public GUIStyle label, button; }
+  public static class GUI { public static GUISkin skin; }
+  public class GUILayoutOption {}
+  public static class GUILayout { public static void BeginArea(Rect r){} public static void EndArea(){} public static void Label(string s, GUIStyle st){} public static bool Button(string s, GUIStyle st, params GUILayoutOption[] o)=>false; public static GUILayoutOption Height(float h)=>null; public static void Space(float f){} public static void BeginHorizontal(){} public static void EndHorizontal(){} }
+  public class SerializeField : Attribute {} public class TooltipAttribute : Attribute { public TooltipAttribute(string s){} }
+  public class DefaultExecutionOrder : Attribute { public DefaultExecutionOrder(int i){} }
+  public static class JsonUtility { static readonly System.Text.Json.JsonSerializerOptions O=new System.Text.Json.JsonSerializerOptions{IncludeFields=true}; public static string ToJson(object o, bool prettyPrint=false)=>System.Text.Json.JsonSerializer.Serialize(o,o.GetType(),O); public static T FromJson<T>(string s)=>System.Text.Json.JsonSerializer.Deserialize<T>(s,O); public static void FromJsonOverwrite(string s, object o){} }
+  public class AsyncOperation { }
+  // Unity 6 Awaitable: minimal task-like type with async method builder support.
+  [AsyncMethodBuilder(typeof(AwaitableBuilder))]
+  public class Awaitable : INotifyCompletion { public bool IsCompleted=>true; public void OnCompleted(Action a){a();} public Awaitable GetAwaiter()=>this; public void GetResult(){}
+    public static Awaitable BackgroundThreadAsync()=>new Awaitable(); public static Awaitable MainThreadAsync()=>new Awaitable(); public static Awaitable WaitForSecondsAsync(float s)=>new Awaitable(); }
+  [AsyncMethodBuilder(typeof(AwaitableBuilder<>))]
+  public class Awaitable<T> : INotifyCompletion { public bool IsCompleted=>true; public void OnCompleted(Action a){a();} public Awaitable<T> GetAwaiter()=>this; public T GetResult()=>default; }
+  public struct AwaitableBuilder { public static AwaitableBuilder Create()=>default; public Awaitable Task=>new Awaitable(); public void SetException(Exception e){} public void SetResult(){} public void SetStateMachine(IAsyncStateMachine m){}
+    public void Start<S>(ref S sm) where S:IAsyncStateMachine { sm.MoveNext(); }
+    public void AwaitOnCompleted<A,S>(ref A a, ref S sm) where A:INotifyCompletion where S:IAsyncStateMachine { sm.MoveNext(); }
+    public void AwaitUnsafeOnCompleted<A,S>(ref A a, ref S sm) where A:ICriticalNotifyCompletion where S:IAsyncStateMachine { sm.MoveNext(); } }
+  public struct AwaitableBuilder<T> { public static AwaitableBuilder<T> Create()=>default; public Awaitable<T> Task=>new Awaitable<T>(); public void SetException(Exception e){} public void SetResult(T r){} public void SetStateMachine(IAsyncStateMachine m){}
+    public void Start<S>(ref S sm) where S:IAsyncStateMachine { sm.MoveNext(); }
+    public void AwaitOnCompleted<A,S>(ref A a, ref S sm) where A:INotifyCompletion where S:IAsyncStateMachine { sm.MoveNext(); }
+    public void AwaitUnsafeOnCompleted<A,S>(ref A a, ref S sm) where A:ICriticalNotifyCompletion where S:IAsyncStateMachine { sm.MoveNext(); } }
+  public static class AsyncOperationAwaitableExtensions { public static Awaitable GetAwaiter(this AsyncOperation op)=>new Awaitable(); }
+}
+namespace UnityEngine.Networking {
+  public class UnityWebRequestAsyncOperation : UnityEngine.AsyncOperation {}
+  public class DownloadHandler { public string text; }
+  public class UnityWebRequest : IDisposable { public enum Result { InProgress, Success, ConnectionError, ProtocolError, DataProcessingError }
+    public static UnityWebRequest Get(string url)=>new UnityWebRequest(); public int timeout; public Result result; public string error; public long responseCode; public DownloadHandler downloadHandler;
+    public UnityWebRequestAsyncOperation SendWebRequest()=>new UnityWebRequestAsyncOperation(); public string GetResponseHeader(string h)=>null; public void Dispose(){} }
+}
+namespace UnityEngine.InputSystem {
+  public class Control { public bool wasPressedThisFrame; }
+  public class Keyboard { public static Keyboard current; public Control f3Key; }
+  public class TouchControl { public Control press; }
+  public class Touchscreen { public static Touchscreen current; public IReadOnlyList<TouchControl> touches; }
+}
+namespace Unity.Profiling { public struct ProfilerMarker { public ProfilerMarker(string n){} public IDisposable Auto()=>null; } }
+namespace Unity.Services.Core { public enum ServicesInitializationState { Uninitialized, Initialized } public static class UnityServices { public static ServicesInitializationState State; public static Task InitializeAsync()=>Task.CompletedTask; } }
+namespace Unity.Services.Authentication { public class AuthenticationService { public static AuthenticationService Instance=new AuthenticationService(); public bool IsSignedIn; public string PlayerId; public Task SignInAnonymouslyAsync()=>Task.CompletedTask; public Task DeleteAccountAsync()=>Task.CompletedTask; public void SignOut(bool clear){} } }
+namespace Unity.Services.CloudSave.Models { public class Item { public ItemValue Value; public string WriteLock; } public class ItemValue { public string S; public T GetAs<T>()=>(T)(object)S; } public class SaveItem { public object Value; public string WriteLock; public SaveItem(object value, string writeLock){Value=value;WriteLock=writeLock;} } }
+namespace Unity.Services.CloudSave { using Unity.Services.CloudSave.Models;
+  public class CloudSaveConflictException : Exception {}
+  public static class FakeCloud { public static Dictionary<string,(string value,string lk)> Store=new Dictionary<string,(string,string)>(); public static bool FailNextLoad, RaceNextSave; public static Action OnLoad; public static int Saves, Loads;
+    public static void ExternalWrite(string key,string value){ Store[key]=(value, Guid.NewGuid().ToString("N").Substring(0,8)); } }
+  public class PlayerDataService {
+    public Task<Dictionary<string,string>> SaveAsync(IDictionary<string,object> d){ FakeCloud.Saves++; var r=new Dictionary<string,string>(); foreach(var kv in d){ FakeCloud.ExternalWrite(kv.Key,(string)kv.Value); r[kv.Key]=FakeCloud.Store[kv.Key].lk; } return Task.FromResult(r); }
+    public Task<Dictionary<string,string>> SaveAsync(IDictionary<string,SaveItem> d){ FakeCloud.Saves++; if(FakeCloud.RaceNextSave){ FakeCloud.RaceNextSave=false; FakeCloud.ExternalWrite("save", System.Text.Json.JsonSerializer.Serialize(new CMP5402.Week7.SaveData{ saveCounter=900, saveId="racer", level=50 }, new System.Text.Json.JsonSerializerOptions{IncludeFields=true})); } var r=new Dictionary<string,string>(); foreach(var kv in d){ if(FakeCloud.Store.TryGetValue(kv.Key,out var cur) && kv.Value.WriteLock!=null && cur.lk!=kv.Value.WriteLock) throw new CloudSaveConflictException(); FakeCloud.ExternalWrite(kv.Key,(string)kv.Value.Value); r[kv.Key]=FakeCloud.Store[kv.Key].lk; } return Task.FromResult(r); }
+    public Task<Dictionary<string,Item>> LoadAsync(HashSet<string> keys){ FakeCloud.Loads++; FakeCloud.OnLoad?.Invoke(); FakeCloud.OnLoad=null; if(FakeCloud.FailNextLoad){ FakeCloud.FailNextLoad=false; throw new Exception("network down"); } var r=new Dictionary<string,Item>(); foreach(var k in keys) if(FakeCloud.Store.TryGetValue(k,out var v)) r[k]=new Item{ Value=new ItemValue{ S=v.value }, WriteLock=v.lk }; return Task.FromResult(r); }
+    public Task DeleteAsync(string key){ FakeCloud.Store.Remove(key); return Task.CompletedTask; } }
+  public class DataService { public PlayerDataService Player=new PlayerDataService(); }
+  public class CloudSaveService { public static CloudSaveService Instance=new CloudSaveService(); public DataService Data=new DataService(); }
+}

@@ -1,0 +1,185 @@
+using System; using System.IO; using System.Reflection; using System.Threading.Tasks; using UnityEngine; using CMP5402.Week7; using Unity.Services.CloudSave;
+class P {
+  static object Call(object o, string m, params object[] a) => o.GetType().GetMethod(m, BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public).Invoke(o, a);
+  static async Task Sync(CloudSync cs, string why) {
+    cs.RequestSync(why);
+    var f = typeof(CloudSync).GetField("runningSync", BindingFlags.Instance|BindingFlags.NonPublic);
+    for (int i = 0; i < 10; i++) { var t = (Task)f.GetValue(cs); if (t != null) await t; if (!cs.SyncRequested) break; cs.RequestSync("queued"); }
+  }
+  static int fails; static void Check(bool ok, string what) { Console.WriteLine((ok ? "  PASS " : "  FAIL ") + what); if (!ok) fails++; }
+  static async Task<int> Main(string[] args) {
+    Application.persistentDataPath = Path.Combine(Path.GetTempPath(), "w7sim-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(Application.persistentDataPath); SaveFile.Delete();
+    PlayerPrefs.D.Clear(); FakeCloud.Store.Clear();
+    SettingsPrefs.CloudSyncEnabled = true;
+    var sm = new SaveManager(); Call(sm, "Awake");
+    var cs = new CloudSync(); Call(cs, "Awake"); Call(cs, "OnEnable");
+    if (args.Length > 0 && args[0] == "--gated")
+    {
+      await RunGated(cs);
+      Console.WriteLine(fails == 0 ? "ALL GATED TESTS PASSED" : fails + " FAILED");
+      return fails == 0 ? 0 : 1;
+    }
+
+    Console.WriteLine("A. restore from cloud must not loop");
+    var remote = new SaveData { saveCounter = 39, saveId = "remoteX", level = 7, coins = 230 };
+    FakeCloud.ExternalWrite("save", JsonUtility.ToJson(remote));
+    FakeCloud.Saves = 0;
+    await Sync(cs, "launch");
+    Check(SaveManager.Data.level == 7 && SaveManager.Data.coins == 230, "cloud progress adopted: " + SaveManager.Data);
+    Check(FakeCloud.Saves <= 1, "at most one upload after restore (" + FakeCloud.Saves + ")");
+    var before = FakeCloud.Store["save"].value; int loads = FakeCloud.Loads;
+    await Sync(cs, "again"); await Sync(cs, "again");
+    Check(FakeCloud.Store["save"].value == before && cs.Status == CloudSync.State.Idle && cs.StatusDetail.StartsWith("in sync"), "stable afterwards: " + cs.StatusDetail);
+
+    Console.WriteLine("B. unsaved local edits must block a silent restore");
+    SaveManager.Change(d => d.coins += 50);                       // dirty, not saved
+    FakeCloud.ExternalWrite("save", JsonUtility.ToJson(new SaveData { saveCounter = 41, saveId = "phoneB1", level = 8 }));
+    await Sync(cs, "cloud changed");
+    Check(cs.HasConflict, "conflict raised, not restore: " + cs.StatusDetail);
+    Check(SaveManager.Data.coins == 280, "local edits intact (" + SaveManager.Data.coins + ")");
+
+    Console.WriteLine("C. resolve keeping local uploads with the lock");
+    cs.Resolve(false); await Sync(cs, "after resolve");
+    var cloudNow = JsonUtility.FromJson<SaveData>(FakeCloud.Store["save"].value);
+    Check(cloudNow.coins == 280 && cloudNow.saveId == SaveManager.Data.saveId, "cloud now holds local copy #" + cloudNow.saveCounter);
+    Check(!cs.HasConflict, "no conflict pending");
+
+    Console.WriteLine("D. upload snapshot: check the recorded ID after a normal upload");
+    SaveManager.Change(d => d.coins += 1); SaveManager.SaveNow("event");   // Saved -> sync -> upload
+    await Sync(cs, "flush");
+    var idUploaded = JsonUtility.FromJson<SaveData>(FakeCloud.Store["save"].value).saveId;
+    Check(PlayerPrefs.GetString("cmp5402.cloud.ancestorId", "") == idUploaded, "ancestor == uploaded id");
+
+    Console.WriteLine("E. failed download uploads nothing");
+    FakeCloud.FailNextLoad = true; int saves = FakeCloud.Saves;
+    SaveManager.Change(d => d.coins += 1); SaveManager.SaveNow("event");   // Saved -> sync runs -> download fails
+    Check(FakeCloud.Saves == saves && cs.Status == CloudSync.State.Error, "no upload on failed read (" + cs.StatusDetail + ")");
+    await Sync(cs, "retry"); Check(FakeCloud.Saves == saves + 1, "uploaded once the read works");
+
+    Console.WriteLine("F. two devices diverge: write lock catches the race");
+    FakeCloud.ExternalWrite("save", JsonUtility.ToJson(new SaveData { saveCounter = 60, saveId = "phoneB2", level = 9 }));
+    SaveManager.Change(d => d.level = 20); SaveManager.SaveNow("event");
+    await Sync(cs, "flush");
+    Check(cs.HasConflict && cs.PendingCloudCopy.level == 9, "divergence detected as conflict: " + cs.StatusDetail);
+    cs.Resolve(true); await Sync(cs, "after");
+    Check(SaveManager.Data.level == 9 && !cs.HasConflict, "cloud copy kept: " + SaveManager.Data);
+
+    Console.WriteLine("G. new game is not mistaken for 'in sync'");
+    long c = SaveManager.Data.saveCounter; SaveManager.NewGame(); await Sync(cs, "flush");
+    Check(SaveManager.Data.saveCounter > c, "counter carried on (" + SaveManager.Data.saveCounter + " > " + c + ")");
+    Check(JsonUtility.FromJson<SaveData>(FakeCloud.Store["save"].value).level == 1, "fresh game uploaded, cloud level 1");
+
+    Console.WriteLine("H. local file: corrupt -> backup, missing -> new, future -> blocked and preserved");
+    SaveManager.Change(d => d.coins = 5); SaveManager.SaveNow("make a backup"); await Sync(cs, "flush");
+    SaveFile.CorruptForTesting(); sm.Load(); Check(SaveManager.LoadedFrom == "backup", "loaded from " + SaveManager.LoadedFrom);
+    SaveFile.Delete(); sm.Load(); Check(SaveManager.LoadedFrom == "new", "loaded from " + SaveManager.LoadedFrom);
+    SaveManager.Change(d => d.level = 3); SaveManager.SaveNow("x"); SaveFile.SetFutureVersionForTesting(); sm.Load();
+    Check(SaveManager.LoadedFrom == "blocked" && !SaveManager.SaveNow("y", true) && File.ReadAllText(SaveFile.MainPath()).Contains("99"), "future save preserved, saving refused");
+    SaveManager.DiscardNewerSave(); Check(File.Exists(SaveFile.UnsupportedPath()) && SaveManager.SaveNow("z", true), "set aside as .newer.json, saving resumes");
+
+    Console.WriteLine("I. write-lock race: other device writes between our read and our upload");
+    SaveManager.Change(d => d.coins = 77); SaveManager.SaveNow("event"); await Sync(cs, "flush");   // now in sync
+    FakeCloud.RaceNextSave = true;
+    SaveManager.Change(d => d.coins = 78); SaveManager.SaveNow("event"); await Sync(cs, "flush");
+    Check(cs.HasConflict && cs.PendingCloudCopy.level == 50, "lock rejected, re-read, conflict raised: " + cs.StatusDetail);
+    Check(JsonUtility.FromJson<SaveData>(FakeCloud.Store["save"].value).saveId == "racer", "other device's copy not overwritten");
+
+    Console.WriteLine("J. no cloud copy + unsaved edits: upload only a saved snapshot");
+    SaveManager.Change(d => d.coins = 10); SaveManager.SaveNow("save"); await Sync(cs, "flush");
+    await cs.DeleteCloudCopyAsync(); cs.SetEnabled(true); await Sync(cs, "flush");   // delete turns sync off; re-enable re-syncs (uploads 10)
+    FakeCloud.Store.Clear();                                                          // cloud empty again
+    string idOnDisk = SaveManager.Data.saveId; SaveManager.Change(d => d.coins = 20);  // dirty, same id on disk
+    await Sync(cs, "launch");
+    var up = JsonUtility.FromJson<SaveData>(FakeCloud.Store["save"].value);
+    Check(up.coins == 20 && up.saveId != idOnDisk && up.saveId == SaveManager.Data.saveId, "saved first, then uploaded under the new id");
+    Check(JsonUtility.FromJson<SaveData>(File.ReadAllText(SaveFile.MainPath())).saveId == up.saveId, "disk and cloud carry the same id and content");
+
+    Console.WriteLine("K. turning sync off during a download must stop the restore");
+    FakeCloud.ExternalWrite("save", JsonUtility.ToJson(new SaveData { saveCounter = 500, saveId = "late", level = 33 }));
+    FakeCloud.OnLoad = () => cs.SetEnabled(false);
+    cs.SetEnabled(true); await Sync(cs, "launch");
+    Check(SaveManager.Data.level != 33 && cs.Status == CloudSync.State.Disabled, "nothing applied: " + cs.StatusDetail);
+
+    Console.WriteLine(fails == 0 ? "ALL PASSED" : fails + " FAILED");
+    return fails == 0 ? 0 : 1;
+  }
+
+  static async Task RunGated(CloudSync cs)
+  {
+    const string key = CloudSync.SaveKey;
+    var cloud = new TestCloudStore();
+    cs.UseTestStore(cloud);
+    SaveManager.Change(d => d.coins = 10);
+    SaveManager.SaveNow("baseline");
+    await cs.CurrentSync;
+
+    Console.WriteLine("L. two gated uploads preserve the intermediate ancestor");
+    var first = cloud.HoldNextWrite();
+    var second = cloud.HoldNextWrite();
+    SaveManager.Change(d => d.coins = 20);
+    SaveManager.SaveNow("first");
+    await first.Entered.WaitAsync(TimeSpan.FromSeconds(5));
+    string firstId = SaveManager.Data.saveId;
+    SaveManager.Change(d => d.coins = 30);
+    SaveManager.SaveNow("second");
+    string secondId = SaveManager.Data.saveId;
+    first.Release();
+    await second.Entered.WaitAsync(TimeSpan.FromSeconds(5));
+    Check(cs.LastSyncedSaveId == firstId && SaveManager.Data.saveId == secondId
+      && SaveManager.Data.coins == 30
+      && JsonUtility.FromJson<SaveData>(cloud.PeekJson(key)).saveId == firstId,
+      "first payload is recorded while the newer local save remains intact");
+    second.Release();
+    await cs.CurrentSync;
+    Check(cs.LastSyncedSaveId == secondId
+      && JsonUtility.FromJson<SaveData>(cloud.PeekJson(key)).saveId == secondId,
+      "follow-up upload converged");
+
+    Console.WriteLine("M. failed read cannot authorise an upload");
+    int writes = cloud.WriteCount;
+    cloud.FailNextRead = true;
+    SaveManager.Change(d => d.coins = 40);
+    SaveManager.SaveNow("failed read");
+    await cs.CurrentSync;
+    Check(cloud.WriteCount == writes && cs.Status == CloudSync.State.Error,
+      "no upload attempted after failed read");
+    await Sync(cs, "retry read");
+    Check(cloud.WriteCount == writes + 1, "a successful read permits upload");
+
+    Console.WriteLine("N. disabling sync during a gated download prevents restore");
+    cloud.ExternalWrite(key, JsonUtility.ToJson(new SaveData { saveId = "late", level = 50, saveCounter = 99 }));
+    var read = cloud.HoldNextRead();
+    cs.RequestSync("gated download");
+    await read.Entered.WaitAsync(TimeSpan.FromSeconds(5));
+    cs.SetEnabled(false);
+    read.Release();
+    await cs.CurrentSync;
+    Check(SaveManager.Data.coins == 40 && cs.Status == CloudSync.State.Disabled,
+      "late result did not replace progress");
+
+    Console.WriteLine("O. edits during a gated read remain available for conflict resolution");
+    read = cloud.HoldNextRead();
+    cs.SetEnabled(true);
+    await read.Entered.WaitAsync(TimeSpan.FromSeconds(5));
+    SaveManager.Change(d => d.coins = 45);
+    read.Release();
+    await cs.CurrentSync;
+    Check(SaveManager.Data.coins == 45 && cs.HasConflict && cs.PendingCloudCopy.saveId == "late",
+      "late read reported conflict and kept local edits");
+    cs.Resolve(false);
+    await cs.CurrentSync;
+
+    Console.WriteLine("P. gated stale write re-reads and preserves the remote copy");
+    var write = cloud.HoldNextWrite();
+    int reads = cloud.ReadCount;
+    SaveManager.Change(d => d.coins = 55);
+    SaveManager.SaveNow("stale write");
+    await write.Entered.WaitAsync(TimeSpan.FromSeconds(5));
+    cloud.ExternalWrite(key, JsonUtility.ToJson(new SaveData { saveId = "racer", level = 60, saveCounter = 200 }));
+    write.Release();
+    await cs.CurrentSync;
+    Check(cloud.ReadCount >= reads + 2 && cs.HasConflict && cs.PendingCloudCopy.saveId == "racer"
+      && JsonUtility.FromJson<SaveData>(cloud.PeekJson(key)).saveId == "racer",
+      "stale write rejected, fresh read detected conflict, remote copy preserved");
+  }
+}
