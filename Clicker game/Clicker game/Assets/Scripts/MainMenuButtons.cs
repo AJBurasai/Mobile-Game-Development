@@ -31,7 +31,7 @@ public class MainMenuButtons : MonoBehaviour
         panel.SetActive(true);
         clickerButton.SetActive(false);
         Time.timeScale = 0f;
-        Haptics.Impact(Haptics.Style.Light);    // light vibration on panel open
+        Haptics.Impact(Haptics.Style.Medium);    // vibration on panel open
     }
 
     public void CloseCurrentPanel()     // close panel, resume game
@@ -42,6 +42,6 @@ public class MainMenuButtons : MonoBehaviour
         currentPanel = null;
         clickerButton.SetActive(true);
         Time.timeScale = 1f;
-        Haptics.Impact(Haptics.Style.Soft);     // soft vibration on panel close
+        Haptics.Impact(Haptics.Style.Rigid);     // vibration on panel close
     }
 }
