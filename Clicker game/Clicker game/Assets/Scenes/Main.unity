@@ -1893,7 +1893,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 950353734}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1155579980}
+        m_TargetAssemblyTypeName: CMP5402.Week8Lab.Week8MonetisationLab, Assembly-CSharp
+        m_MethodName: TryTestReward
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &950353734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2154,13 +2166,14 @@ GameObject:
   - component: {fileID: 1155579977}
   - component: {fileID: 1155579979}
   - component: {fileID: 1155579978}
+  - component: {fileID: 1155579980}
   m_Layer: 5
   m_Name: StorePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1155579977
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2223,6 +2236,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1155579976}
   m_CullTransparentMesh: 1
+--- !u!114 &1155579980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1155579976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3182a3cb1ad508442bf29a2f9feb8341, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CMP5402.Week8Lab.Week8MonetisationLab
+  status: {fileID: 1256954851}
+  rewardButton: {fileID: 950353733}
+  purchaseButton: {fileID: 1717864609}
+  testProfile: test-matrix3
+  adOutcome: 0
+  shopAvailable: 1
+  simulateSaveFailure: 0
+  testOrderId: order-a
 --- !u!1 &1166021637
 GameObject:
   m_ObjectHideFlags: 0
@@ -3829,7 +3862,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -161.42178}
+  m_AnchoredPosition: {x: 0, y: -28}
   m_SizeDelta: {x: 492.2125, y: 361.7661}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1539578903
@@ -4075,7 +4108,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1717864610}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1155579980}
+        m_TargetAssemblyTypeName: CMP5402.Week8Lab.Week8MonetisationLab, Assembly-CSharp
+        m_MethodName: TryTestPurchase
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1717864610
 MonoBehaviour:
   m_ObjectHideFlags: 0
