@@ -7,7 +7,7 @@ public static class Haptics
     public enum Style { Light, Medium, Heavy, Soft, Rigid }
 
 #if UNITY_IOS && !UNITY_EDITOR      //using #if makes it so it is ignored in editor and will only work on device
-    [DllImport("__Internal)]
+    [DllImport("__Internal")]
     private static extern void _HapticImpact(int style);
 #endif
 
