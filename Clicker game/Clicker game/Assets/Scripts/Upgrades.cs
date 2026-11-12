@@ -8,8 +8,13 @@ public class Upgrades : MonoBehaviour
 {
     /* this script handles the text and labels for upgrades */
 
-    public TMP_Text LevelText;
-    public TMP_Text NameText;
-    public TMP_Text CostText;
+    [Header("Click upgrade")]
+    public TMP_Text clickUpgradeLevelText;
+    public TMP_Text clickUpgradeNameText;
+    public TMP_Text clickUpgradeCostText;
 
+    [Header("Orb upgrade")]
+    public TMP_Text orbUpgradeLevelText;
+    public TMP_Text orbUpgradeNameText;
+    public TMP_Text orbUpgradeCostText;
 }

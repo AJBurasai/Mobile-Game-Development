@@ -10,13 +10,6 @@ public class ClickerController : MonoBehaviour
     public GameData gameData; 
     public TextMeshProUGUI potionsText;
 
-    /*      // not working as intended right now, fix later as this will help make code cleaner
-    public void Start()     
-    {
-        upgradesManager.StartUpgradeManager();
-    }
-    */
-
     public void Update()        // update ui on every frame
     {
         potionsText.text = gameData.potions + " potions";
@@ -25,6 +18,8 @@ public class ClickerController : MonoBehaviour
     public void BrewPotion()        // make potion when cauldron clicked based on upgrade strength
     {
         gameData.potions += ClickStrength();
+        gameData.totalCauldronTaps++;
+        gameData.totalPotionsMade += ClickStrength();
     }
 
     public double ClickStrength()       // return value used for calculating how many potions to add to running total

@@ -1,10 +1,17 @@
 using UnityEngine;
+using TMPro;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 public class MainMenuButtons : MonoBehaviour
 {
     /* This script handles the main menu buttons found at the bottom of the game screen */
 
     public GameObject clickerButton;
+    public TextMeshProUGUI statsText;
+    public GameData gameData;
+    public GameObject statsPanel;
 
     private GameObject currentPanel;    // panel that is currently open, null = all panels closed
 
@@ -32,6 +39,7 @@ public class MainMenuButtons : MonoBehaviour
         clickerButton.SetActive(false);
         Time.timeScale = 0f;
         Haptics.Impact(Haptics.Style.Medium);    // vibration on panel open
+
     }
 
     public void CloseCurrentPanel()     // close panel, resume game
@@ -43,5 +51,10 @@ public class MainMenuButtons : MonoBehaviour
         clickerButton.SetActive(true);
         Time.timeScale = 1f;
         Haptics.Impact(Haptics.Style.Rigid);     // vibration on panel close
+    }
+
+    public void UpdateStatsPanel()
+    {
+        statsText.text = "Total potions brewed: " + gameData.totalPotionsMade.ToString() + "\nTotal cauldron taps: " + gameData.totalCauldronTaps.ToString() + "\nTotal upgrades purchased: " + gameData.totalUpgradesPurchased.ToString();
     }
 }
