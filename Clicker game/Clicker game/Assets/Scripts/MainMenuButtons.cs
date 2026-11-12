@@ -4,68 +4,44 @@ public class MainMenuButtons : MonoBehaviour
 {
     /* This script handles the main menu buttons found at the bottom of the game screen */
 
-    /// ------ find a neater way to do this or it will get very messy -----
-    private bool isPaused = false;
     public GameObject clickerButton;
-    public GameObject upgradesPanel;
-    public GameObject storePanel;
 
-    public void UpgradesButtonTapped()
+    private GameObject currentPanel;    // panel that is currently open, null = all panels closed
+
+
+    public void TogglePanel(GameObject panel)
     {
-        if (!isPaused)          // check if the game is already paused or not
+        if (currentPanel == panel)  // if same button tapped twice, close panel
         {
-            ShowUpgradesPanel();
+            CloseCurrentPanel();
             return;
         }
-        if (isPaused)
+
+        if (currentPanel != null)   // if different panel is open, close it first then open new one
         {
-            HideUpgradesPanel();
-            return;
+            currentPanel.SetActive(false);
         }
+
+        OpenPanel(panel);
     }
 
-    public void StoreButtonTapped()
+    private void OpenPanel(GameObject panel)    // show panel, pause game
     {
-        if (!isPaused)          
-        {
-            ShowStorePanel();
-            return;
-        }
-        if (isPaused)
-        {
-            HideStorePanel();
-            return;
-        }
-    }    
-
-    public void ShowUpgradesPanel()        //shows upgrades panel, pauses game
-    {
-        Time.timeScale = 0f;
-        isPaused = true;
-        upgradesPanel.SetActive(true);
+        currentPanel = panel;
+        panel.SetActive(true);
         clickerButton.SetActive(false);
-    }
-
-    public void HideUpgradesPanel ()           // hides upgrades panel, resumes game
-    {
-        Time.timeScale = 1f;
-        isPaused = false;
-        upgradesPanel.SetActive(false);
-        clickerButton.SetActive(true);
-    }
-
-    public void ShowStorePanel()
-    {
         Time.timeScale = 0f;
-        isPaused = true;
-        storePanel.SetActive(true);
-        clickerButton.SetActive(false);
+        Haptics.Impact(Haptics.Style.Medium);    // vibration on panel open
     }
-    public void HideStorePanel()           // hides upgrades panel, resumes game
+
+    public void CloseCurrentPanel()     // close panel, resume game
     {
-        Time.timeScale = 1f;
-        isPaused = false;
-        storePanel.SetActive(false);
+        if (currentPanel ==  null) { return; }  // ignore function if no panel active
+
+        currentPanel.SetActive(false);
+        currentPanel = null;
         clickerButton.SetActive(true);
+        Time.timeScale = 1f;
+        Haptics.Impact(Haptics.Style.Rigid);     // vibration on panel close
     }
 }
