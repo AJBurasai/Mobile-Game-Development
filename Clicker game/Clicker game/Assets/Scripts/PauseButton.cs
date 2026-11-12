@@ -10,7 +10,7 @@ public class PauseButton : MonoBehaviour
 
     public void PauseButtonTapped()            // call function when button clicked
     {
-        Debug.Log("Pause button tapped");
+        
         if (!isPaused)          // check if the game is already paused or not
         {
             PauseGame();

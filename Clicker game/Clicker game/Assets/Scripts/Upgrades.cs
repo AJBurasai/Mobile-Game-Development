@@ -6,7 +6,7 @@ using TMPro;
 
 public class Upgrades : MonoBehaviour
 {
-    /* this script handles the text and  labels for upgrades */
+    /* this script handles the text and labels for upgrades */
 
     public TMP_Text LevelText;
     public TMP_Text NameText;
