@@ -20,7 +20,7 @@ public class UpgradesManager : MonoBehaviour
     public Upgrades clickUpgrade;
     public Upgrades orbUpgrade;
 
-    void Start()
+    void Start()        // when implementing save feature, take this out as it will reset progress for upgrades
     {
         StartUpgradeManager();
     }
