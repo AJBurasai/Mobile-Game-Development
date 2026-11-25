@@ -6,12 +6,16 @@ public class GameData : MonoBehaviour
 {
     /* This script holds most public variables and things related to game data*/
 
+    [Header("Potions and upgrade levels")]
     public double potions;
     public double clickUpgradeLevel;        // current level for click upgrade, increases cost per level
+    public double orbUpgradeLevel;
+
+    [Header("Stats")]
     public int totalUpgradesPurchased;
     public double totalPotionsMade;
     public double totalCauldronTaps;
-    public double orbUpgradeLevel;
+    
 
     public GameData()
     {

@@ -63,11 +63,6 @@ public class UpgradesManager : MonoBehaviour
         return type == UpgradeType.Click ? clickUpgradeCostMult : orbUpgradeCostMult;
     }
 
-    public double Cost()        // increases cost when upgrade is bought
-    {
-        return Math.Ceiling(clickUpgradeBaseCost * Math.Pow(clickUpgradeCostMult, clickerController.gameData.clickUpgradeLevel));
-    }
-
     public double Cost(UpgradeType type)        // cost calc
     {
         return Math.Ceiling(GetBaseCost(type) * Math.Pow(GetCostMult(type), GetLevel(type)));
@@ -85,7 +80,7 @@ public class UpgradesManager : MonoBehaviour
             clickerController.gameData.potions -= Cost(type);
             IncreaseLevel(type);
             clickerController.gameData.totalUpgradesPurchased++;
-            // add haptic feedback here
+            Haptics.Impact(Haptics.Style.Medium);
         }
 
         UpdateClickUpgradeUI();     // update ui when something is bought
