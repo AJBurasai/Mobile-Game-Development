@@ -30,7 +30,7 @@ public class UpgradesManager : MonoBehaviour
         clickUpgradeBaseCost = 20;
         clickUpgradeCostMult = 1.5;
         orbUpgradeBaseCost = 100;
-        orbUpgradeCostMult = 1.8;
+        orbUpgradeCostMult = 1.4;
         UpdateClickUpgradeUI();
     }
 
