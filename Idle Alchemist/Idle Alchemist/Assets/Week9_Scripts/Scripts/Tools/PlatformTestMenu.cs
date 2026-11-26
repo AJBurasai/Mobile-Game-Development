@@ -61,7 +61,7 @@ namespace CMP5402.Week9
                 button = new GUIStyle(GUI.skin.button) { fontSize = fontSize };
             }
             var hub = PlatformHub.Instance;
-            GUILayout.BeginArea(new Rect(20, 20, Screen.width - 40, Screen.height - 40));
+            GUILayout.BeginArea(new Rect(20, 120, Screen.width - 40, Screen.height - 40));
             if (hub == null) { GUILayout.Label("No PlatformHub", label); GUILayout.EndArea(); return; }
 
             var svc = hub.Services;

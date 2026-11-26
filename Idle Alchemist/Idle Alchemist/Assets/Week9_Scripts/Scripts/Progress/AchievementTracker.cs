@@ -40,10 +40,10 @@ namespace CMP5402.Week9
         public const string FirstClear = "first_clear";
         public const string WorldOne = "world_one";
         public const string SpeedRun = "speed_run";
-        public const string Hunter = "hunter";            // incremental: totalSteps 100 in PlatformIds
+        public const string First100 = "first_100";            // incremental: totalSteps 100 in PlatformIds
         public const string FastestLevel = "fastest_level";   // leaderboard, lowerIsBetter
 
-        public const int HunterBatch = 10;
+        public const int First100Batch = 100;
 
         readonly PlatformHub hub;
         readonly ProgressRecord progress;
@@ -75,9 +75,9 @@ namespace CMP5402.Week9
         public void OnEnemyDefeated()
         {
             progress.enemiesDefeated++;
-            if (progress.enemiesDefeated % HunterBatch == 0)          // batch, never per kill
+            if (progress.enemiesDefeated % First100Batch == 0)          // batch, never per kill
             {
-                hub.ReportProgress(Hunter, progress.enemiesDefeated);   // absolute, idempotent
+                hub.ReportProgress(First100, progress.enemiesDefeated);   // absolute, idempotent
                 save?.Invoke();
             }
         }
@@ -93,7 +93,7 @@ namespace CMP5402.Week9
         public void Resync()
         {
             foreach (var id in progress.unlocked) hub.UnlockAchievement(id);
-            if (progress.enemiesDefeated > 0) hub.ReportProgress(Hunter, progress.enemiesDefeated);
+            if (progress.enemiesDefeated > 0) hub.ReportProgress(First100, progress.enemiesDefeated);
             if (progress.bestLevelTimeMs != long.MaxValue) hub.SubmitScore(FastestLevel, progress.bestLevelTimeMs);
         }
     }

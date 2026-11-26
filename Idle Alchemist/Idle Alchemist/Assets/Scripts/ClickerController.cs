@@ -40,6 +40,7 @@ public class ClickerController : MonoBehaviour
         gameData.potions += strength;
         gameData.totalCauldronTaps++;
         gameData.totalPotionsMade += strength;
+        ProgressStore.Instance.Tracker.OnEnemyDefeated();
     }
 
     public double ClickStrength()       // return value used for potions per click
